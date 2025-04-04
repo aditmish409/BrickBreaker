@@ -39,10 +39,13 @@ namespace BrickBreaker
 
         List<Bricks> bricksList = new List<Bricks>();
 
+        List<Rectangle> ballLives = new List<Rectangle>();
+
         SoundPlayer collisionSound;
 
         public GameScreen()
         {
+            
             InitializeComponent();
             InitializeGame();
 
@@ -50,10 +53,25 @@ namespace BrickBreaker
 
         public void InitializeGame()
         {
+            ballLives.Clear();
+            score = 0;
+
             collisionSound = new SoundPlayer(Properties.Resources.collisionSound);
 
             gameScreenHeight = this.Height;
             gameScreenWidth = this.Width;
+
+            //Part of Design, Draws 3 ellipses(balls) if shaded in, the player has that many balls remaining if just empty the player has no balls
+
+            int ballSize = 15;       //Size of ball
+            int startX = 10;         //Starting x position of ball
+            int startY = 10;         //Starting y position of ball
+            int spacing = 20;        //Space between balls
+
+            for (int i = 0; i < amountOfBalls; i++)
+            {
+               ballLives.Add(new Rectangle(startX + (i * spacing), startY, ballSize, ballSize));
+            }
 
             gameBall = new Ball(this.Width / 2, this.Height - 40, 10, -8);
             gamePaddle = new Paddle();
@@ -113,21 +131,6 @@ namespace BrickBreaker
                     }
                     bricksList.Add(new Bricks(x, y, brickWidth, brickHeight, brickColor, hitPoints)); //Add the brick to the list
                 }
-            }
-        }
-
-        //Part of Design, Draws 3 ellipses(balls) if shaded in, the player has that many balls remaining if just empty the player has no balls
-        private void DrawBallLives(Graphics g)
-        {
-            int ballSize = 15;       //Size of ball
-            int startX = 10;         //Starting x position of ball
-            int startY = 10;         //Starting y position of ball
-            int spacing = 20;        //Space between balls
-
-            for (int i = 0; i < amountOfBalls; i++)
-            {
-                g.DrawEllipse(whitePen, startX + (i * spacing), startY, ballSize, ballSize);        //Draws the outline of the ball
-                g.FillEllipse(whiteBrush, startX + (i * spacing), startY, ballSize, ballSize);      //Fills the ball with white color
             }
         }
 
@@ -209,11 +212,15 @@ namespace BrickBreaker
                 if (gameBall.y + gameBall.size >= GameScreen.gameScreenHeight)
                 {
                     gameBall.isMoving = false;
-                    amountOfBalls--;
+                    if (ballLives.Count > 0) 
+                    {
+                        ballLives.RemoveAt(ballLives.Count - 1);
+                    }
+                    
                     gameBall.x = gamePaddle.x + gamePaddle.paddleWidth / 2 - gameBall.size / 2;
                     gameBall.y = gamePaddle.y - gameBall.size;
                 }
-                if (amountOfBalls == 0)
+                if (ballLives.Count == 0)
                 {
                     gameTimer.Stop();
                     Form1.ChangeScreen(this, new GameOverScreen());
@@ -286,7 +293,12 @@ namespace BrickBreaker
         {
             scoreLabel.Text = $"{score}";
 
-            DrawBallLives(e.Graphics);  //Paints the amount of balls the player has.
+            //Paints the amount of balls the player has.
+            foreach (Rectangle ball in ballLives)
+            {
+                e.Graphics.DrawEllipse(whitePen, ball);
+                e.Graphics.FillEllipse(whiteBrush, ball);
+            } 
             e.Graphics.FillEllipse(whiteBrush, gameBall.x, gameBall.y, gameBall.size, gameBall.size); //Paints the ball
             e.Graphics.FillRectangle(whiteBrush, gamePaddle.x, gamePaddle.y, gamePaddle.paddleWidth, gamePaddle.paddleHeight); //Paints the paddle
 

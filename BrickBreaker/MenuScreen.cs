@@ -19,21 +19,20 @@ namespace BrickBreaker
 
         private void easyButton_Click(object sender, EventArgs e)
         {
-            Form1.ChangeScreen(this, new GameScreen());
             GameScreen.amountOfBalls = 5;
+            Form1.ChangeScreen(this, new GameScreen());
         }
 
         private void mediumButton_Click(object sender, EventArgs e)
         {
-            Form1.ChangeScreen(this, new GameScreen());
             GameScreen.amountOfBalls = 3;
+            Form1.ChangeScreen(this, new GameScreen());
         }
 
         private void hardButton_Click(object sender, EventArgs e)
         {
-            Form1.ChangeScreen(this, new GameScreen());
             GameScreen.amountOfBalls = 1;
-
+            Form1.ChangeScreen(this, new GameScreen());
         }
 
         private void exitButton_Click(object sender, EventArgs e)
